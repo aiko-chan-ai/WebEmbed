@@ -119,7 +119,7 @@ window.location.href = "${redirect}";
     html += `
 </head>
 <body>
-<p>Copy <a href="${config.WebURL}${req.originalUrl}">this URL</a> to Discord Message</p>
+<p>Copy <a href="${config.WebURL}${req.originalUrl.slice(1)}">this URL</a> to Discord Message</p>
 </body>
 </html>`;
     return res.status(200).send(html);
