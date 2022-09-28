@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import { Collection } from '@discordjs/collection';
 import config from './config.js';
 import axios from 'axios';
-const oembed = (provider_name, provider_url, author_name, author_url) => {
+const oembed = (provider_name, provider_url, author_name, author_url, url) => {
 	const baseObject = {
 		version: '1.0',
 	};
@@ -17,6 +17,9 @@ const oembed = (provider_name, provider_url, author_name, author_url) => {
 	if (author_url) {
 		baseObject.author_url = author_url;
 	}
+    if (url) {
+        baseObject.url = url;
+    }
 	return baseObject;
 };
 
@@ -77,6 +80,9 @@ app.get('/embed', (req, res) => {
     if (author_url) {
         oembedURL += `author_url=${encodeURIComponent(author_url)}&`;
     }
+    if (url) {
+        oembedURL += `url=${encodeURIComponent(url)}&`;
+    }
     oembedURL = oembedURL.slice(0, -1);
     // add oembed to html
     html += `\n<link type="application/json+oembed" href="${oembedURL}" />`;
@@ -96,10 +102,13 @@ app.get('/embed', (req, res) => {
         html += `\n<meta property="og:site_name" content="${provider_name}">`;
     }
     if (title) {
-        html += `\n<meta content="${title}" property="og:title">`;
+        html += `\n<meta content="${title}" property="og:title">
+<meta property="twitter:title" content="${title}">`;
     }
     if (url) {
-        html += `\n<meta content="${url}" property="og:url">`;
+        html += `\n<meta content="${url}" property="og:url">
+<meta property="twitter:url" content="${url}">\n
+<meta name="url" content="${url}">`;
     }
     if (video) {
         html += `
@@ -112,9 +121,7 @@ app.get('/embed', (req, res) => {
     }
     if (redirect) {
         html += `
-<script type="text/javascript">
-window.location.href = "${redirect}";
-</script>\n`;
+<meta http-equiv="refresh" content="0; url=${redirect}" />`;
     }
     html += `
 </head>
@@ -131,8 +138,9 @@ app.get('/oembed', (req, res) => {
         provider_url,
         author_name,
         author_url,
+        url,
     } = req.query;
-    return res.status(200).send(oembed(provider_name, provider_url, author_name, author_url));
+    return res.status(200).send(oembed(provider_name, provider_url, author_name, author_url, url));
 });
 app.get('/short', function(req, res) {
     const url = req.query.url;
