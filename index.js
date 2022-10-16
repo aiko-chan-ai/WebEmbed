@@ -1,6 +1,5 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { Collection } from '@discordjs/collection';
 import config from './config.js';
 import axios from 'axios';
 const oembed = (provider_name, provider_url, author_name, author_url, url) => {
@@ -26,7 +25,7 @@ const oembed = (provider_name, provider_url, author_name, author_url, url) => {
 // Main
 const app = express();
 
-const cache = new Collection() // Collection<path,full>
+const cache = new Map() // Collection<path,full>
 
 app.use(bodyParser.json());
 app.use(
@@ -67,7 +66,7 @@ app.get('/embed', (req, res) => {
     let html = '<html>';
     html += '\n<head>';
     // join oembed
-    let oembedURL = config.WebURL + 'oembed?';
+    let oembedURL = process.env.WEBURL || config.WebURL + 'oembed?';
     if (provider_name) {
         oembedURL += `provider_name=${encodeURIComponent(provider_name)}&`;
     }
@@ -126,7 +125,7 @@ app.get('/embed', (req, res) => {
     html += `
 </head>
 <body>
-<p>Copy <a href="${config.WebURL}${req.originalUrl.slice(1)}">this URL</a> to Discord Message</p>
+<p>Copy <a href="${process.env.WEBURL || config.WebURL}${req.originalUrl.slice(1)}">this URL</a> to Discord Message</p>
 </body>
 </html>`;
     return res.status(200).send(html);
@@ -147,7 +146,7 @@ app.get('/short', function(req, res) {
     if (!url) {return res.status(400).send({ msg: 'error', code: 400 });}
     const randomURL = cache.findKey((v) => v == url) || randomURLPath(8);
     cache.set(randomURL, url);
-    return res.status(200).send(`${config.WebURL}short/${randomURL}`);
+    return res.status(200).send(`${process.env.WEBURL || config.WebURL}short/${randomURL}`);
 });
 app.get('/short/:path', async (req, res) => {
     const path = req.params.path;
@@ -164,7 +163,7 @@ app.use(function(req, res) {
 });
 // Heroku not died
 setInterval(async () => {
-    await axios.get(config.WebURL).catch(e => {});
+    await axios.get(process.env.WEBURL || config.WebURL).catch(e => {});
 }, 1_000 * 60 * 10);
 //
 const server = app.listen(process.env.PORT ?? config.port, (error) => {
