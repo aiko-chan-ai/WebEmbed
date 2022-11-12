@@ -46,7 +46,7 @@ const randomURLPath = (length = 6) => {
 
 // embed
 app.get('/', (req, res) => res.status(200).send('hello world'));
-// oembed: request to host
+
 app.get('/embed', (req, res) => {
     if (req.query.image_type && !['image', 'thumbnail'].includes(req.query.image_type)) return res.status(400).send('Invalid image type specified\nType: "image" or "thumbnail"');
     const {
@@ -66,7 +66,7 @@ app.get('/embed', (req, res) => {
     let html = '<html>';
     html += '\n<head>';
     // join oembed
-    let oembedURL = process.env.WEBURL || config.WebURL + 'oembed?';
+    let oembedURL = (process.env.WEBURL || config.WebURL) + 'oembed?';
     if (provider_name) {
         oembedURL += `provider_name=${encodeURIComponent(provider_name)}&`;
     }
@@ -161,10 +161,6 @@ app.use(function(req, res) {
         data: req.originalUrl + ' is incorrect',
     });
 });
-// Heroku not died
-setInterval(async () => {
-    await axios.get(process.env.WEBURL || config.WebURL).catch(e => {});
-}, 1_000 * 60 * 10);
 //
 const server = app.listen(process.env.PORT ?? config.port, (error) => {
     if (error) return console.log(`Error: ${error}`);
