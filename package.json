@@ -1,6 +1,6 @@
 {
   "name": "webembed",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -14,6 +14,9 @@
   "dependencies": {
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "jsdom": "^22.1.0",
+    "morgan": "^1.10.0",
+    "node-cron": "^3.0.2"
   }
 }
