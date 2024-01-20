@@ -120,8 +120,8 @@ app.get('/embed', (req, res) => {
 	}
 	if (color) {
 		const metaElement = document.createElement('meta');
-		metaElement.setAttribute('name', 'twitter:card');
-		metaElement.setAttribute('content', 'summary_large_image');
+		metaElement.setAttribute('name', 'theme-color');
+		metaElement.setAttribute('content', color);
 		document.head.appendChild(metaElement);
 	}
 	if (description) {
